@@ -1,112 +1,86 @@
 import pygame, sys
- 
+from pygame.locals import *
+
 pygame.init()
- 
-WIDTH, HEIGHT = 900, 900
- 
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Tic Tac Toe!")
 
-BOARD = pygame.image.load("assets/Board.png")
-X_IMG = pygame.image.load("assets/X.png")
-O_IMG = pygame.image.load("assets/O.png")
+MANH_HINH = pygame.display.set_mode((900, 800))
+pygame.display.set_caption("Cờ chéo")
 
-BG_COLOR = (214, 201, 227)
+BAN = pygame.image.load("./assets/Board.png")
+HINH_X = pygame.image.load("./assets/X.png")
+HINH_O = pygame.image.load("./assets/O.png")
 
-board = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-graphical_board = [[[None, None], [None, None], [None, None]], 
-                    [[None, None], [None, None], [None, None]], 
-                    [[None, None], [None, None], [None, None]]]
 
-to_move = 'X'
+Mau_Nen = (214, 201, 227)
+trang_thai_game = False
 
-SCREEN.fill(BG_COLOR)
-SCREEN.blit(BOARD, (64, 64))
+bang_hinh = [[[None, None], [None, None], [None, None]], [[None, None], [None, None], [None, None]],[[None, None], [None, None], [None, None]]]
+bang = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
+
+luot_di = 'X'
+
+MANH_HINH.fill(Mau_Nen)
+MANH_HINH.blit(BAN, (64, 64))
 pygame.display.update()
 
-def render_board(board, ximg, oimg):
-    global graphical_board
-    for i in range(3):
-        for j in range(3):
-            if board[i][j] == 'X':
-                # Create an X image and rect
-                graphical_board[i][j][0] = ximg
-                graphical_board[i][j][1] = ximg.get_rect(center=(j*300+150, i*300+150))
-            elif board[i][j] == 'O':
-                graphical_board[i][j][0] = oimg
-                graphical_board[i][j][1] = oimg.get_rect(center=(j*300+150, i*300+150))
 
-def add_XO(board, graphical_board, to_move):
-    current_pos = pygame.mouse.get_pos()
-    converted_x = (current_pos[0]-65)/835*2
-    converted_y = current_pos[1]/835*2
-    if board[round(converted_y)][round(converted_x)] != 'O' and board[round(converted_y)][round(converted_x)] != 'X':
-        board[round(converted_y)][round(converted_x)] = to_move
-        if to_move == 'O':
-            to_move = 'X'
-        else:
-            to_move = 'O'
+def them_toado(bang, bang_hinh, luot_di):
+    vi_tri_hien_tai = pygame.mouse.get_pos()
+    hang = vi_tri_hien_tai[1] // 300
+    cot = vi_tri_hien_tai[0] // 300
     
-    render_board(board, X_IMG, O_IMG)
+    if bang[hang][cot] != 'O' and bang[hang][cot] != 'X':
+        bang[hang][cot] = luot_di
+        luot_di = 'O' if luot_di == 'X' else 'X'
+    
+    ve_bang(bang, HINH_X, HINH_O)
 
     for i in range(3):
         for j in range(3):
-            if graphical_board[i][j][0] is not None:
-                SCREEN.blit(graphical_board[i][j][0], graphical_board[i][j][1])
+            if bang_hinh[i][j][0] is not None:
+                MANH_HINH.blit(bang_hinh[i][j][0], bang_hinh[i][j][1])
     
-    return board, to_move
+    return bang, luot_di
 
-game_finished = False
+def ve_bang(bang, hinh_x, hinh_o):
+    global bang_hinh
+    for i in range(3):
+        for j in range(3):
+            if bang[i][j] == 'O':
+                bang_hinh[i][j][0] = hinh_o
+                bang_hinh[i][j][1] = hinh_o.get_rect(center=(j * 300 + 150, i * 300 + 150))
+            elif bang[i][j] == 'X':
+                bang_hinh[i][j][0] = hinh_x
+                bang_hinh[i][j][1] = hinh_x.get_rect(center=(j * 300 + 150, i * 300 + 150))
+            
 
-def check_win(board):
-    winner = None
-    for row in range(0, 3):
-        if((board[row][0] == board[row][1] == board[row][2]) and (board [row][0] is not None)):
-            winner = board[row][0]
-            for i in range(0, 3):
-                graphical_board[row][i][0] = pygame.image.load(f"assets/Winning {winner}.png")
-                SCREEN.blit(graphical_board[row][i][0], graphical_board[row][i][1])
-            pygame.display.update()
-            return winner
+def kiem_tra_thang(bang):
+    nguoi_thang = None
+    for hang in range(3):
+        if bang[hang][0] == bang[hang][1] == bang[hang][2] and bang[hang][0] is not None:
+            nguoi_thang = bang[hang][0]
+            return nguoi_thang
 
-    for col in range(0, 3):
-        if((board[0][col] == board[1][col] == board[2][col]) and (board[0][col] is not None)):
-            winner =  board[0][col]
-            for i in range(0, 3):
-                graphical_board[i][col][0] = pygame.image.load(f"assets/Winning {winner}.png")
-                SCREEN.blit(graphical_board[i][col][0], graphical_board[i][col][1])
-            pygame.display.update()
-            return winner
-   
-    if (board[0][0] == board[1][1] == board[2][2]) and (board[0][0] is not None):
-        winner =  board[0][0]
-        graphical_board[0][0][0] = pygame.image.load(f"assets/Winning {winner}.png")
-        SCREEN.blit(graphical_board[0][0][0], graphical_board[0][0][1])
-        graphical_board[1][1][0] = pygame.image.load(f"assets/Winning {winner}.png")
-        SCREEN.blit(graphical_board[1][1][0], graphical_board[1][1][1])
-        graphical_board[2][2][0] = pygame.image.load(f"assets/Winning {winner}.png")
-        SCREEN.blit(graphical_board[2][2][0], graphical_board[2][2][1])
-        pygame.display.update()
-        return winner
-          
-    if (board[0][2] == board[1][1] == board[2][0]) and (board[0][2] is not None):
-        winner =  board[0][2]
-        graphical_board[0][2][0] = pygame.image.load(f"assets/Winning {winner}.png")
-        SCREEN.blit(graphical_board[0][2][0], graphical_board[0][2][1])
-        graphical_board[1][1][0] = pygame.image.load(f"assets/Winning {winner}.png")
-        SCREEN.blit(graphical_board[1][1][0], graphical_board[1][1][1])
-        graphical_board[2][0][0] = pygame.image.load(f"assets/Winning {winner}.png")
-        SCREEN.blit(graphical_board[2][0][0], graphical_board[2][0][1])
-        pygame.display.update()
-        return winner
+    for cot in range(3):
+        if bang[0][cot] == bang[1][cot] == bang[2][cot] and bang[0][cot] is not None:
+            nguoi_thang = bang[0][cot]
+            return nguoi_thang
+
+    if bang[0][0] == bang[1][1] == bang[2][2] and bang[0][0] is not None:
+        nguoi_thang = bang[0][0]
+        return nguoi_thang
+
+    if bang[0][2] == bang[1][1] == bang[2][0] and bang[0][2] is not None:
+        nguoi_thang = bang[0][2]
+        return nguoi_thang
     
-    if winner is None:
-        for i in range(len(board)):
-            for j in range(len(board)):
-                if board[i][j] != 'X' and board[i][j] != 'O':
+    if nguoi_thang is None:
+        for hang in bang:
+            for o in hang:
+                if isinstance(o, int):
                     return None
-        return "DRAW"
+        return "HÒA"
 
 while True:
     for event in pygame.event.get():
@@ -114,24 +88,17 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            board, to_move = add_XO(board, graphical_board, to_move)
-
-            if game_finished:
-                board = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-                graphical_board = [[[None, None], [None, None], [None, None]], 
-                                    [[None, None], [None, None], [None, None]], 
-                                    [[None, None], [None, None], [None, None]]]
-
-                to_move = 'X'
-
-                SCREEN.fill(BG_COLOR)
-                SCREEN.blit(BOARD, (64, 64))
-
-                game_finished = False
-
+            bang, luot_di = them_toado(bang, bang_hinh, luot_di)
+            if trang_thai_game:
+                bang_hinh = [[[None, None], [None, None], [None, None]],[[None, None], [None, None], [None, None]], [[None, None], [None, None], [None, None]]]
+                bang = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+                luot_di = 'X'
+                MANH_HINH.fill(Mau_Nen)
+                MANH_HINH.blit(BAN, (64, 64))
+                trang_thai_game = False
                 pygame.display.update()
-            
-            if check_win(board) is not None:
-                game_finished = True
-            
+
+            if kiem_tra_thang(bang) is not None:
+                trang_thai_game = True
+
             pygame.display.update()
