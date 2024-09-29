@@ -13,8 +13,8 @@ hinhO = pygame.image.load("./assets/O.png")
 mauNen = (214, 201, 227)
 bang = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 trangThaiGame = False
-boardImage=[[[None,None],[None,None],[None,None]],[[None,None],[None,None],[None,None]],[[None, None],[None,None],[None,None]]]
-
+khoiTao=[[[None,None],[None,None],[None,None]],[[None,None],[None,None],[None,None]],[[None, None],[None,None],[None,None]]]
+boardImage = khoiTao
 
 
 luot_di = 'X'
@@ -91,8 +91,7 @@ while True:
         if event.type == MOUSEBUTTONDOWN:
             bang, luot_di = themToaDo(bang, boardImage, luot_di)
             if trangThaiGame:
-                boardImage = [[[None,None], [None,None], [None,None]],[[None,None], 
-                                [None,None],[None, None]], [[None,None], [None, None], [None, None]]]
+                boardImage = khoiTao
                 bang = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
                 luot_di = 'X'
                 manHinh.fill(mauNen)
